@@ -43,8 +43,11 @@
         let showingAnswer = false;
         let currentQuestion = '';
         let currentAnswer = '';
+        let currentQuestionObj = null;
         let teamCount = 4; // Start with 4 teams
         let answeredQuestions = JSON.parse(getCookie('answeredQuestions') || '[]');
+        let currentHintIndex = 0;
+        let currentHints = [];
 
         // Load saved scores from cookie
         const savedScores = getCookie('scores');
@@ -97,12 +100,47 @@
 
             currentQuestion = question;
             currentAnswer = answer;
+            currentQuestionObj = questionDiv.questionObj || null;
 
-            // Store points in the popup for later use
-            popup.dataset.points = points;
+            // Collect hints and sort them
+            currentHints = [];
+            if (currentQuestionObj) {
+                currentHints = Object.keys(currentQuestionObj)
+                    .filter(key => key.startsWith('hint'))
+                    .sort()
+                    .map(key => currentQuestionObj[key]);
+            }
+            currentHintIndex = 0;
 
-            content.innerHTML = question.replace(/\n/g, '<br>'); // Replace \n with <br>
+            content.innerHTML = currentQuestion.replace(/\n/g, '<br>'); // Replace \n with <br>
             buttons.innerHTML = '';
+
+            // Display hint-button only if hints are available
+            if (currentHints.length > 0) {
+                const hintButton = document.createElement('button');
+                hintButton.textContent = 'Hinweis anzeigen';
+                hintButton.onclick = function() {
+                    if (currentHintIndex < currentHints.length) {
+                        let hintDiv = document.getElementById('hint-div');
+                        if (!hintDiv) {
+                            hintDiv = document.createElement('div');
+                            hintDiv.id = 'hint-div';
+                            hintDiv.className = 'hint';
+                            content.appendChild(hintDiv);
+                        }
+                        // Append the new hint instead of replacing
+                        const hintHtml = `<div><b>Hinweis:</b> ${currentHints[currentHintIndex]}</div>`;
+                        hintDiv.innerHTML += hintHtml;
+                        currentHintIndex++;
+                        if (currentHintIndex >= currentHints.length) {
+                            hintButton.disabled = true;
+                            hintButton.textContent = 'Keine weiteren Hinweise';
+                        }
+                    }
+                };
+                buttons.appendChild(hintButton);
+            }
+
             toggleButton.textContent = 'Antwort';
 
             popup.style.display = 'block';
@@ -115,10 +153,10 @@
             const toggleButton = document.getElementById('toggle-answer-button');
 
             if (!showingAnswer) {
-                content.innerHTML = currentAnswer.replace(/\n/g, '<br>'); // Replace \n with <br>
+                content.innerHTML = currentAnswer.replace(/\n/g, '<br>');
                 buttons.innerHTML = '';
                 for (let i = 1; i <= teamCount; i++) {
-                    const teamName = document.getElementById(`team${i}`).textContent.split(':')[0]; // Get the updated team name
+                    const teamName = document.getElementById(`team${i}`).textContent.split(':')[0];
                     const button = document.createElement('button');
                     button.textContent = teamName;
                     button.onclick = () => {
@@ -129,9 +167,8 @@
                 }
                 toggleButton.textContent = 'Frage';
             } else {
-                content.innerHTML = currentQuestion.replace(/\n/g, '<br>'); // Replace \n with <br>
-                buttons.innerHTML = '';
-                toggleButton.textContent = 'Antwort';
+                // Display Question and reset hints
+                handleQuestionClick(document.querySelector(`.question[data-question="${currentQuestion}"][data-points="${document.querySelector('.popup').dataset.points}"]`));
             }
 
             showingAnswer = !showingAnswer;
@@ -294,12 +331,18 @@
                         const questionDiv = document.createElement('div');
                         questionDiv.className = 'question';
                         questionDiv.textContent = question.points;
-                        questionDiv.dataset.points = question.points;
+                        questionDiv.questionObj = question;
                         questionDiv.dataset.question = question.question;
                         questionDiv.dataset.answer = question.answer;
+                        questionDiv.dataset.points = question.points;
                         questionDiv.onclick = () => handleQuestionClick(questionDiv);
 
-                        // check if the question has been answered
+                        // When the question is a guess question, add a special class
+                        if (question.guess === true) {
+                            questionDiv.classList.add('guess-question');
+                        }
+
+                        // Check if the question has been answered
                         const qid = question.question + '|' + question.points;
                         if (answeredQuestions.includes(qid)) {
                             questionDiv.classList.add('answered');
@@ -325,6 +368,39 @@
             const value = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
             return value ? decodeURIComponent(value.pop()) : null;
         }
+
+        // Drag & Drop for loading question.json
+        document.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            document.body.style.background = "#222"; // Optional: visual feedback
+        });
+        document.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            document.body.style.background = ""; // Reset background
+        });
+        document.addEventListener('drop', function(e) {
+            e.preventDefault();
+            document.body.style.background = ""; // Reset background
+        
+            if (e.dataTransfer.files.length === 0) return;
+            const file = e.dataTransfer.files[0];
+            if (!file.name.endsWith('.json')) {
+                alert('Please drop a .json file!');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (event) => {
+            try {
+                const data = JSON.parse(event.target.result);
+                setCookie('questions', JSON.stringify(data));
+                populateQuestions(data);
+                alert('Questions loaded successfully!');
+            } catch (error) {
+                alert('Error loading questions: ' + error.message);
+            }
+        };
+        reader.readAsText(file);
+    });
     </script>
 </body>
 </html>

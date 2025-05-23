@@ -160,3 +160,12 @@ body {
     background-color: gray !important;
     color: white !important;
 }
+
+.guess-question {
+    border: 3px dashed gold;
+}
+
+.hint {
+    margin: 4px 0;
+    color: #ffd700;
+}
