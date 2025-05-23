@@ -1,0 +1,130 @@
+{
+    "Items": [
+        {
+            "question": "Wie viel Crit ist das insgesamt?\nInfinity Edge, Bloodthirster, Phantom Dancer, Lord Dominik’s Regards, Berserker’s Greaves",
+            "answer": "75%",
+            "points": 100
+        },
+        {
+            "question": "Wie viel kostet Giant's Belt?",
+            "answer": "900",
+            "points": 200
+        },
+        {
+            "question": "Wie viele unterschiedliche Versionen von Schuhen gibt es?\nInklusive Feats of Strength.",
+            "answer": "16",
+            "points": 300
+        },
+        {
+            "question": "Welches Item (inkl. Passive und maximalen Stacks) gibt die meiste AP auf Kassadin mit Level 18?\nNur Summoners Rift items.",
+            "answer": "Rabadons Deathcap 169",
+            "points": 400
+        },
+        {
+            "question": "Wo findet man das Item „Super Mech Power Field“?",
+            "answer": "Super Minion",
+            "points": 500
+        },
+        {
+            "question": "Welches vollwertige Nicht-Support-Item hat die höchste Gold-Effizienz?",
+            "answer": "Essence Reaver",
+            "points": 1000
+        }
+    ],
+    "Champions": [
+        {
+            "question": "Wie viele Champions gibt es?",
+            "answer": "170",
+            "points": 100
+        },
+        {
+            "question": "Wie niedrig kann die Bewegungsgeschwindigkeit eines Champions minimal sein?",
+            "answer": "110",
+            "points": 200
+        },
+        {
+            "question": "Welcher Champion hat den geringsten Base AD auf Level 18?",
+            "answer": "Senna 50",
+            "points": 300
+        },
+        {
+            "question": "Wie viele Champions haben „infinite scaling“?",
+            "answer": "Nasus, Veigar, Sion, Thresh, Senna, Kindred, Swain, Cho'Gath, Aurelion Sol, Bel’Veth, Bard 11",
+            "points": 400
+        },
+        {
+            "question": "Welcher Champion bekommt passiv Bonus auf Heal- und Shieldpower?“?",
+            "answer": "Yuumi",
+            "points": 500
+        },
+        {
+            "question": "Welche Champions können das Attack-Speed-Cap ignorieren?",
+            "answer": "Bel'Veth, Jinx, Kennen, Varus",
+            "points": 1000
+        }
+    ],
+    "Lore": [
+        {
+            "question": "Wer ist die Schwester von Garen?",
+            "answer": "Lux",
+            "points": 100
+        },
+        {
+            "question": "Wie viele Götter, die auch Champions sind, gibt es im Freljord?",
+            "answer": "Volibear, Ornn, Anivia 3",
+            "points": 200
+        },
+        {
+            "question": "Wie viele große Nationen gibt es?",
+            "answer": "8 (Bilgewater, Demacia, Freljord, Ionia, Ixtal, Noxus, Shurima, Targon)",
+            "points": 300
+        },
+        {
+            "question": "Was ist der gemeinsame Feind von Kai’Sa und Bel’Veth?",
+            "answer": "Watcher",
+            "points": 400
+        },
+        {
+            "question": "Warum hasst Zed Gangplank?",
+            "answer": "Gangplank hat seinen Tempel geplündert.",
+            "points": 500
+        },
+        {
+            "question": "Mit welchem Gegenstand kann man Darkin wieder zu Menschen machen?",
+            "answer": "Sivir’s Chalicar",
+            "points": 1000
+        }
+    ],
+    "Shroom for Error": [
+        {
+            "question": "Wie oft wurde der am häufigsten gebannte Champion bei den Worlds gebannt?",
+            "answer": "Kalista 144",
+            "points": 100
+        },
+        {
+            "question": "Wie viele Redemptions braucht man, um einen Mundo mit 6000 HP instant zu töten?",
+            "answer": "10",
+            "points": 200
+        },
+        {
+            "question": "Wie viele Sekunden Cooldown hat Flash auf ARAM mit Ionian Boots of Lucidity, Grisly Mementos und Cosmic Insight?",
+            "answer": "119,05s",
+            "points": 300
+        },
+        {
+            "question": "Was kann man mit Cleanse nicht entfernen?",
+            "answer": "Knock-ups, Quinn/Graves Blind (Nearsight), Suppression",
+            "points": 400
+        },
+        {
+            "question": "Wie viele Minions spawnen in einem 90-Minuten-Spiel, bei dem kein Inhibitor zerstört wurde?",
+            "answer": "7302",
+            "points": 500
+        },
+        {
+            "question": "Wie viel Prozent AD-Scaling hat die am besten skalierende Fähigkeit im Spiel?",
+            "answer": "Kalista E 17780%",
+            "points": 1000
+        }
+    ]
+}

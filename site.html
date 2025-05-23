@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>LoL Quiz</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+<body>
+    <h1>LoL Quiz</h1>
+    <div class="settings-icon" onclick="toggleSettingsMenu()">⚙️</div>
+    <div class="settings-menu" id="settings-menu">
+        <h3>Settings</h3>
+        <input type="text" id="team1-name" placeholder="Enter Team 1 Name">
+        <input type="text" id="team2-name" placeholder="Enter Team 2 Name">
+        <input type="text" id="team3-name" placeholder="Enter Team 3 Name">
+        <input type="text" id="team4-name" placeholder="Enter Team 4 Name">
+        <button onclick="updateTeamNames()">Update Team Names</button>
+        <button onclick="addTeam()">Add Team</button>
+        <button onclick="removeTeam()">Remove Team</button>
+        <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+        <button onclick="resetScores()">Reset Points</button>
+    </div>
+    <div class="team-scores">
+        <div class="team" id="team1">Team 1: <span id="score1">0</span></div>
+        <div class="team" id="team2">Team 2: <span id="score2">0</span></div>
+        <div class="team" id="team3">Team 3: <span id="score3">0</span></div>
+        <div class="team" id="team4">Team 4: <span id="score4">0</span></div>
+    </div>
+    <div class="jeopardy-board">
+        <!-- Categories and questions will be dynamically loaded here -->
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+        <p id="popup-content"></p>
+        <div id="popup-buttons"></div>
+        <button id="toggle-answer-button" onclick="toggleAnswer()">Antwort</button>
+    </div>
+
+    <script>
+        const scores = [0];
+        let showingAnswer = false;
+        let currentQuestion = '';
+        let currentAnswer = '';
+        let teamCount = 4; // Start with 4 teams
+        let answeredQuestions = JSON.parse(getCookie('answeredQuestions') || '[]');
+
+        // Load saved scores from cookie
+        const savedScores = getCookie('scores');
+        if (savedScores) {
+            const arr = JSON.parse(savedScores);
+            teamCount = arr.length; // set teamCount based on saved scores
+
+            const teamScores = document.querySelector('.team-scores');
+            teamScores.innerHTML = '';
+            const settingsMenu = document.getElementById('settings-menu');
+            //delete old inputs(except buttons and title)
+            Array.from(settingsMenu.querySelectorAll('input')).forEach(input => input.remove());
+
+            for (let i = 0; i < arr.length; i++) {
+                // Team-Div
+                const teamDiv = document.createElement('div');
+                teamDiv.className = 'team';
+                teamDiv.id = `team${i+1}`;
+                teamDiv.innerHTML = `Team ${i+1}: <span id="score${i+1}">${arr[i]}</span>`;
+                teamScores.appendChild(teamDiv);
+
+                // Input field for team name
+                const teamInput = document.createElement('input');
+                teamInput.type = 'text';
+                teamInput.id = `team${i+1}-name`;
+                teamInput.placeholder = `Enter Team ${i+1} Name`;
+                settingsMenu.insertBefore(teamInput, settingsMenu.querySelector('button[onclick="updateTeamNames()"]'));
+            }
+
+            // update score array
+            for (let i = 0; i < arr.length; i++) {
+                scores[i] = arr[i];
+            }
+        } else {
+            // if no saved scores, initialize with 4 teams
+            teamCount = 4;
+        }
+
+        function handleQuestionClick(questionDiv) {
+            const popup = document.getElementById('popup');
+            const overlay = document.getElementById('overlay');
+            const content = document.getElementById('popup-content');
+            const buttons = document.getElementById('popup-buttons');
+            const toggleButton = document.getElementById('toggle-answer-button');
+
+            // Retrieve data from the clicked question div
+            const points = parseInt(questionDiv.dataset.points);
+            const question = questionDiv.dataset.question;
+            const answer = questionDiv.dataset.answer;
+
+            currentQuestion = question;
+            currentAnswer = answer;
+
+            // Store points in the popup for later use
+            popup.dataset.points = points;
+
+            content.innerHTML = question.replace(/\n/g, '<br>'); // Replace \n with <br>
+            buttons.innerHTML = '';
+            toggleButton.textContent = 'Antwort';
+
+            popup.style.display = 'block';
+            overlay.style.display = 'block';
+        }
+
+        function toggleAnswer() {
+            const content = document.getElementById('popup-content');
+            const buttons = document.getElementById('popup-buttons');
+            const toggleButton = document.getElementById('toggle-answer-button');
+
+            if (!showingAnswer) {
+                content.innerHTML = currentAnswer.replace(/\n/g, '<br>'); // Replace \n with <br>
+                buttons.innerHTML = '';
+                for (let i = 1; i <= teamCount; i++) {
+                    const teamName = document.getElementById(`team${i}`).textContent.split(':')[0]; // Get the updated team name
+                    const button = document.createElement('button');
+                    button.textContent = teamName;
+                    button.onclick = () => {
+                        updateScore(i, parseInt(document.querySelector('.popup').dataset.points));
+                        closePopup();
+                    };
+                    buttons.appendChild(button);
+                }
+                toggleButton.textContent = 'Frage';
+            } else {
+                content.innerHTML = currentQuestion.replace(/\n/g, '<br>'); // Replace \n with <br>
+                buttons.innerHTML = '';
+                toggleButton.textContent = 'Antwort';
+            }
+
+            showingAnswer = !showingAnswer;
+        }
+
+        function updateScore(team, points) {
+            scores[team - 1] += points;
+            document.getElementById(`score${team}`).textContent = scores[team - 1];
+
+            // Save points to cookie
+            setCookie('scores', JSON.stringify(scores));
+
+            // Make the question div gray and save its status
+            const questionDivs = document.querySelectorAll('.question');
+            questionDivs.forEach(div => {
+                if (div.dataset.question === currentQuestion) {
+                    div.classList.add('answered');
+                    // Save unique ID for question
+                    const qid = div.dataset.question + '|' + div.dataset.points;
+                    if (!answeredQuestions.includes(qid)) {
+                        answeredQuestions.push(qid);
+                        setCookie('answeredQuestions', JSON.stringify(answeredQuestions));
+                    }
+                }
+            });
+
+            closePopup();
+        }
+
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+            showingAnswer = false; // Reset to allow the next question to show
+        }
+
+        function toggleDarkMode() {
+            const currentTheme = document.documentElement.getAttribute("data-theme");
+            if (currentTheme === "dark") {
+                document.documentElement.setAttribute("data-theme", "light");
+            } else {
+                document.documentElement.setAttribute("data-theme", "dark");
+            }
+        }
+
+        function toggleSettingsMenu() {
+            const menu = document.getElementById("settings-menu");
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
+        }
+
+        function updateTeamNames() {
+            for (let i = 1; i <= teamCount; i++) {
+                const teamNameInput = document.getElementById(`team${i}-name`);
+                const teamName = teamNameInput.value;
+                if (teamName) {
+                    document.getElementById(`team${i}`).innerHTML = `${teamName}: <span id="score${i}">${scores[i - 1] || 0}</span>`;
+                }
+            }
+
+            toggleSettingsMenu(); // Close the settings menu after updating
+        }
+
+        function addTeam() {
+            if (teamCount >= 10) {
+                alert("Maximum of 10 teams allowed.");
+                return;
+            }
+
+            teamCount++;
+            scores.push(0); // Add a new score entry for the new team
+
+            const teamScores = document.querySelector('.team-scores');
+            const newTeamDiv = document.createElement('div');
+            newTeamDiv.className = 'team';
+            newTeamDiv.id = `team${teamCount}`;
+            newTeamDiv.innerHTML = `Team ${teamCount}: <span id="score${teamCount}">0</span>`;
+            teamScores.appendChild(newTeamDiv);
+
+            const settingsMenu = document.getElementById('settings-menu');
+
+
+            // Create the input field for the new team
+            const newTeamInput = document.createElement('input');
+            newTeamInput.type = 'text';
+            newTeamInput.id = `team${teamCount}-name`;
+            newTeamInput.placeholder = `Enter Team ${teamCount} Name`;
+
+            // Insert input field into the settings menu
+            settingsMenu.insertBefore(newTeamInput, settingsMenu.querySelector('button[onclick="updateTeamNames()"]'));
+
+            console.log(scores)
+            // save updated scores to cookie
+            setCookie('scores', JSON.stringify(scores));
+        }
+
+        function removeTeam() {
+            if (teamCount <= 1) {
+                alert("At least one team is required.");
+                return;
+            }
+
+            // Remove the last team from the scores section
+            const lastTeamDiv = document.getElementById(`team${teamCount}`);
+            lastTeamDiv.remove();
+
+            // Remove the corresponding input field from the settings menu
+            const lastTeamInput = document.getElementById(`team${teamCount}-name`);
+            lastTeamInput.remove();
+
+            scores.pop(); // Remove the last score entry
+            teamCount--;
+
+            // save updated scores to cookie
+            setCookie('scores', JSON.stringify(scores));
+        }
+
+        function resetScores() {
+            for (let i = 0; i < teamCount; i++) {
+                scores[i] = 0;
+                const scoreSpan = document.getElementById(`score${i+1}`);
+                if (scoreSpan) scoreSpan.textContent = 0;
+            }
+            setCookie('scores', JSON.stringify(scores));
+
+            // Reset answered questions
+            answeredQuestions = [];
+            setCookie('answeredQuestions', JSON.stringify(answeredQuestions));
+            document.querySelectorAll('.question.answered').forEach(div => div.classList.remove('answered'));
+        }
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                closePopup(); // Call the existing closePopup function
+            }
+        });
+
+        fetch('question.json')
+            .then(response => response.json())
+            .then(data => {
+                populateQuestions(data);
+            });
+
+        function populateQuestions(data) {
+            const board = document.querySelector('.jeopardy-board');
+            board.innerHTML = '';
+
+            const categories = Object.keys(data);
+            categories.forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                if (category.length > 12) categoryDiv.classList.add('adjust-font-size');
+                categoryDiv.textContent = category;
+                board.appendChild(categoryDiv);
+            });
+
+            const maxQuestions = Math.max(...categories.map(category => data[category].length));
+            for (let i = 0; i < maxQuestions; i++) {
+                categories.forEach(category => {
+                    const question = data[category][i];
+                    if (question) {
+                        const questionDiv = document.createElement('div');
+                        questionDiv.className = 'question';
+                        questionDiv.textContent = question.points;
+                        questionDiv.dataset.points = question.points;
+                        questionDiv.dataset.question = question.question;
+                        questionDiv.dataset.answer = question.answer;
+                        questionDiv.onclick = () => handleQuestionClick(questionDiv);
+
+                        // check if the question has been answered
+                        const qid = question.question + '|' + question.points;
+                        if (answeredQuestions.includes(qid)) {
+                            questionDiv.classList.add('answered');
+                        }
+
+                        board.appendChild(questionDiv);
+                    } else {
+                        const emptyDiv = document.createElement('div');
+                        emptyDiv.className = 'question';
+                        emptyDiv.style.visibility = 'hidden';
+                        board.appendChild(emptyDiv);
+                    }
+                });
+            }
+        }
+
+        function setCookie(name, value, days = 365) {
+            const expires = new Date(Date.now() + days*24*60*60*1000).toUTCString();
+            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+        }
+
+        function getCookie(name) {
+            const value = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+            return value ? decodeURIComponent(value.pop()) : null;
+        }
+    </script>
+</body>
+</html>
