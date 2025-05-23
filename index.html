@@ -20,6 +20,7 @@
         <button onclick="removeTeam()">Remove Team</button>
         <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
         <button onclick="resetScores()">Reset Points</button>
+        <button onclick="deleteQuestionsCookie()">Delete Questions Cookie</button>
     </div>
     <div class="team-scores">
         <div class="team" id="team1">Team 1: <span id="score1">0</span></div>
@@ -39,7 +40,7 @@
     </div>
 
     <script>
-        const scores = [0];
+        let scores = [0];
         let showingAnswer = false;
         let currentQuestion = '';
         let currentAnswer = '';
@@ -95,6 +96,7 @@
 
             // Retrieve data from the clicked question div
             const points = parseInt(questionDiv.dataset.points);
+            popup.dataset.points = points; // Set the points on the popup for later use
             const question = questionDiv.dataset.question;
             const answer = questionDiv.dataset.answer;
 
@@ -296,6 +298,15 @@
             answeredQuestions = [];
             setCookie('answeredQuestions', JSON.stringify(answeredQuestions));
             document.querySelectorAll('.question.answered').forEach(div => div.classList.remove('answered'));
+            toggleSettingsMenu(); // Close the settings menu after resetting
+        }
+
+        function deleteQuestionsCookie() {
+            // Delete the questions cookie
+            sessionStorage.removeItem('questions');
+            resetScores(); // Reset scores and answered questions
+            toggleSettingsMenu(); // Close the settings menu after deleting
+            location.reload(); // Reload the page to refresh the board
         }
 
         document.addEventListener("keydown", (event) => {
@@ -304,11 +315,16 @@
             }
         });
 
-        fetch('question.json')
-            .then(response => response.json())
-            .then(data => {
-                populateQuestions(data);
-            });
+        const savedQuestions = sessionStorage.getItem('questions');
+        if (savedQuestions) {
+            populateQuestions(JSON.parse(savedQuestions));
+        } else {
+            fetch('question.json')
+                .then(response => response.json())
+                .then(data => {
+                    populateQuestions(data);
+                });
+        }
 
         function populateQuestions(data) {
             const board = document.querySelector('.jeopardy-board');
@@ -392,9 +408,8 @@
             reader.onload = (event) => {
             try {
                 const data = JSON.parse(event.target.result);
-                setCookie('questions', JSON.stringify(data));
+                sessionStorage.setItem('questions', JSON.stringify(data));
                 populateQuestions(data);
-                alert('Questions loaded successfully!');
             } catch (error) {
                 alert('Error loading questions: ' + error.message);
             }
