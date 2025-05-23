@@ -132,6 +132,10 @@ body {
     display: none;
     z-index: 1001;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 30vw;      /* Never wider than 30% of the viewport width */
+    width: 350px;         /* Optional: default width for desktop */
+    min-width: 220px;     /* Optional: minimum width for usability */
+    box-sizing: border-box;
 }
 
 .settings-menu input {
@@ -168,4 +172,9 @@ body {
 .hint {
     margin: 4px 0;
     color: #ffd700;
+}
+
+.quiz-title-group {
+    margin-top: 16px;
+    gap: 8px;
 }

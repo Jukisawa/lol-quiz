@@ -11,13 +11,13 @@
     <div class="settings-icon" onclick="toggleSettingsMenu()">⚙️</div>
     <div class="settings-menu" id="settings-menu">
         <h3>Settings</h3>
-        <input type="text" id="team1-name" placeholder="Enter Team 1 Name">
-        <input type="text" id="team2-name" placeholder="Enter Team 2 Name">
-        <input type="text" id="team3-name" placeholder="Enter Team 3 Name">
-        <input type="text" id="team4-name" placeholder="Enter Team 4 Name">
-        <button onclick="updateTeamNames()">Update Team Names</button>
+        <div id="team-inputs"></div>
         <button onclick="addTeam()">Add Team</button>
         <button onclick="removeTeam()">Remove Team</button>
+        <div class="quiz-title-group">
+            <input type="text" id="quiz-title-input" placeholder="Enter Quiz Title">
+            <button onclick="updateQuizTitle()">Update Title</button>
+        </div>
         <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
         <button onclick="resetScores()">Reset Points</button>
         <button onclick="deleteQuestionsCookie()">Delete Questions Cookie</button>
@@ -59,8 +59,8 @@
             const teamScores = document.querySelector('.team-scores');
             teamScores.innerHTML = '';
             const settingsMenu = document.getElementById('settings-menu');
-            //delete old inputs(except buttons and title)
-            Array.from(settingsMenu.querySelectorAll('input')).forEach(input => input.remove());
+            //Only remove team name inputs
+            Array.from(settingsMenu.querySelectorAll('input[id^="team"]')).forEach(input => input.remove());
 
             for (let i = 0; i < arr.length; i++) {
                 // Team-Div
@@ -75,7 +75,15 @@
                 teamInput.type = 'text';
                 teamInput.id = `team${i+1}-name`;
                 teamInput.placeholder = `Enter Team ${i+1} Name`;
-                settingsMenu.insertBefore(teamInput, settingsMenu.querySelector('button[onclick="updateTeamNames()"]'));
+                document.getElementById('team-inputs').appendChild(teamInput);
+
+                // Live update team name
+                teamInput.addEventListener('input', function() {
+                    const teamDiv = document.getElementById(`team${i+1}`);
+                    if (teamDiv) {
+                        teamDiv.innerHTML = `${this.value || 'Team ' + (i+1)}: <span id="score${i+1}">${scores[i] || 0}</span>`;
+                    }
+                });
             }
 
             // update score array
@@ -130,7 +138,7 @@
                             hintDiv.className = 'hint';
                             content.appendChild(hintDiv);
                         }
-                        // Append the new hint instead of replacing
+                        // Append the new hint
                         const hintHtml = `<div><b>Hinweis:</b> ${currentHints[currentHintIndex]}</div>`;
                         hintDiv.innerHTML += hintHtml;
                         currentHintIndex++;
@@ -232,6 +240,23 @@
             toggleSettingsMenu(); // Close the settings menu after updating
         }
 
+        function updateQuizTitle() {
+            const titleInput = document.getElementById('quiz-title-input');
+            const newTitle = titleInput.value.trim();
+            if (newTitle) {
+                document.title = newTitle;
+                document.querySelector('h1').textContent = newTitle;
+                setCookie('quizTitle', newTitle);
+            }
+        }
+
+        // On page load, restore title if saved
+        const savedTitle = getCookie('quizTitle');
+        if (savedTitle) {
+            document.title = savedTitle;
+            document.querySelector('h1').textContent = savedTitle;
+        }
+
         function addTeam() {
             if (teamCount >= 10) {
                 alert("Maximum of 10 teams allowed.");
@@ -241,6 +266,7 @@
             teamCount++;
             scores.push(0); // Add a new score entry for the new team
 
+            // Add to the team-scores div
             const teamScores = document.querySelector('.team-scores');
             const newTeamDiv = document.createElement('div');
             newTeamDiv.className = 'team';
@@ -248,20 +274,22 @@
             newTeamDiv.innerHTML = `Team ${teamCount}: <span id="score${teamCount}">0</span>`;
             teamScores.appendChild(newTeamDiv);
 
-            const settingsMenu = document.getElementById('settings-menu');
-
-
-            // Create the input field for the new team
+            // Add to the team-inputs div in the settings menu
+            const teamInputsDiv = document.getElementById('team-inputs');
             const newTeamInput = document.createElement('input');
             newTeamInput.type = 'text';
             newTeamInput.id = `team${teamCount}-name`;
             newTeamInput.placeholder = `Enter Team ${teamCount} Name`;
+            teamInputsDiv.appendChild(newTeamInput);
 
-            // Insert input field into the settings menu
-            settingsMenu.insertBefore(newTeamInput, settingsMenu.querySelector('button[onclick="updateTeamNames()"]'));
+            // Live update team name
+            newTeamInput.addEventListener('input', function() {
+                const teamDiv = document.getElementById(`team${teamCount}`);
+                if (teamDiv) {
+                    teamDiv.innerHTML = `${this.value || 'Team ' + (teamCount)}: <span id="score${teamCount}">${scores[teamCount - 1] || 0}</span>`;
+                }
+            });
 
-            console.log(scores)
-            // save updated scores to cookie
             setCookie('scores', JSON.stringify(scores));
         }
 
