@@ -9,6 +9,8 @@
 <body>
     <h1>LoL Quiz</h1>
     <div class="settings-icon" onclick="toggleSettingsMenu()">⚙️</div>
+    <div class="info-icon" onclick="toggleInfoMenu()">ℹ️</div>
+
     <div class="settings-menu" id="settings-menu">
         <h3>Settings</h3>
         <div id="team-inputs"></div>
@@ -22,6 +24,7 @@
         <button onclick="resetScores()">Reset Points</button>
         <button onclick="deleteQuestionsCookie()">Delete Questions Cookie</button>
     </div>
+
     <div class="team-scores">
         <div class="team" id="team1">Team 1: <span id="score1">0</span></div>
         <div class="team" id="team2">Team 2: <span id="score2">0</span></div>
@@ -37,6 +40,34 @@
         <p id="popup-content"></p>
         <div id="popup-buttons"></div>
         <button id="toggle-answer-button" onclick="toggleAnswer()">Antwort</button>
+    </div>
+
+    <div class="info-menu" id="info-menu">
+        <h3>Info</h3>
+        <p>
+            Willkommen zum Quiz!<br>
+            - Drag & drop eine <code>question.json</code> Datei irgendwo hin um die Fragen zu laden<br>
+            - In den Einstellungen kannst du die Teams anpassen<br>
+            - Fragen mit gelben Rand sind Schätzfragen.<br>
+            - Das Fragefenster kann jederzeit mit ESC geschlossen werden.<br>
+            <br>
+            How to Play:<br>
+            1. Startreihenfolge durch Zufall/Würfel festlegen.<br>
+            2. Spieler wählt eine Frage.<br>
+            3. Entweder dürfen die Spieler in Reihenfolge die Frage beantworten.<br>
+            3.1 Alternativ mit Buzzer(Discord Soundboard) und wer als erstes buzzert darf antworten.<br>
+            3.2 Bei Schätzfragen gibt jeder Spieler eine geheime Schätzung an den Spielleiter.<br>
+            4. Wenn Spieler Probleme haben können Hinweise angezeigt werden<br>
+            5. Wenn jemand die Frage richtig beantwortet oder jeder eine Schätzung abgegeben hat, kann der Spielleiter die Antwort anzeigen.<br>
+            6. Der Spielleiter kann dann die Punkte für die Teams vergeben.<br>
+            7. Sollten mehrere Teams die Fragen richtig beantworten bekommen alle Teams die Punkte.<br>
+            7.1 Dafür muss der Spielleiter die selbe Frage noch mal aufrufen und den Teams die Punkte geben.<br>
+            8. Sollte niemand die Frage richtig beantworten so kann die Frage mit Rechtsklick als Beantwortet markiert werden ohne das ein Team Punkte bekommt.<br>
+            8.1 Dazu muss das Fragefenster erst geschlossen werden.<br>
+            9. Das Spiel geht weiter bis alle Fragen beantwortet sind.<br>
+            <br>
+            Have fun!
+        </p>
     </div>
 
     <script>
@@ -228,6 +259,11 @@
             menu.style.display = menu.style.display === "block" ? "none" : "block";
         }
 
+        function toggleInfoMenu() {
+            const menu = document.getElementById("info-menu");
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
+        }
+
         function updateTeamNames() {
             for (let i = 1; i <= teamCount; i++) {
                 const teamNameInput = document.getElementById(`team${i}-name`);
@@ -380,6 +416,18 @@
                         questionDiv.dataset.answer = question.answer;
                         questionDiv.dataset.points = question.points;
                         questionDiv.onclick = () => handleQuestionClick(questionDiv);
+
+                        // Add right-click event to mark as answered without giving points
+                        questionDiv.oncontextmenu = function(e) {
+                            e.preventDefault();
+                            questionDiv.classList.add('answered');
+                            const qid = question.question + '|' + question.points;
+                            if (!answeredQuestions.includes(qid)) {
+                                answeredQuestions.push(qid);
+                                setCookie('answeredQuestions', JSON.stringify(answeredQuestions));
+                            }
+                            return false;
+                        };
 
                         // When the question is a guess question, add a special class
                         if (question.guess === true) {

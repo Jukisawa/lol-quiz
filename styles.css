@@ -178,3 +178,27 @@ body {
     margin-top: 16px;
     gap: 8px;
 }
+
+.info-icon {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 1100;
+}
+
+.info-menu {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 10px;
+    background: var(--popup-bg, #222);
+    color: var(--text-color, #fff);
+    border: 2px solid var(--category-bg, #444);
+    border-radius: 10px;
+    padding: 20px;
+    z-index: 1101;
+    max-width: 2000px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
