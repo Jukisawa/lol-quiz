@@ -210,3 +210,11 @@ body {
     display: inline-block;
     margin-top: 10px;
 }
+
+.info-left {
+    text-align: left;
+}
+
+.info-center {
+    text-align: center;
+}
