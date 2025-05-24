@@ -202,3 +202,11 @@ body {
     max-width: 2000px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
+
+.info-menu a {
+    color: #ffd700;
+    text-decoration: underline;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 10px;
+}
