@@ -1,0 +1,30 @@
+<button class="settings" (click)="openPopup()">
+  ⚙️
+</button>
+
+
+<div class="popup" *ngIf="showPopup">
+  <div class="popup-content">
+    <div>
+        <button class="settings-group-button" (click)="displayTeamSettings()">
+            Team
+        </button>
+        <button class="settings-group-button" (click)="displayGameSettings()">
+            Team
+        </button>
+    </div>
+
+    <div *ngIf="showTeamSettings" class="team-settings">
+        <!--Team settings -->
+    </div>
+    <div *ngIf="showGameSettings" class="game-settings">
+        <!--Game settings -->
+    </div>
+
+
+
+    <div class="button-row">
+      <button (click)="applySettings()">Einstellungen anwenden</button>
+      <button (click)="closePopup()">Schließen</button>
+    </div>
+  </div>

@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { Quiz } from './quiz/quiz'; // Adjust the path if needed
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Quiz],
+  imports: [Quiz],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

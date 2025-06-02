@@ -1,0 +1,17 @@
+
+# dependencies
+node_modules
+
+# configuration files
+src/server.config.ts
+
+# build files
+.tmp
+
+#editor files
+.idea
+
+# OS files
+.DS_Store
+
+git remote add origin tino_hellmich@bitbucket.org:tino_hellmich/simple-rest-server.git

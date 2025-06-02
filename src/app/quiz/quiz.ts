@@ -18,10 +18,10 @@ export class Quiz implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.http.get<Question[]>('http://localhost:3000/api/questions')
+    this.http.get<Question[]>('http://localhost:3000/api/question/find')
       .subscribe(data => this.questions = data);
-    this.http.get<string[]>('http://localhost:3000/api/categories')
-      .subscribe(data => this.categories = data);
+    this.http.get<{name: string}[]>('http://localhost:3000/api/category/find')
+      .subscribe(data => this.categories = data.map((c => c.name)));
   }
 
   getQuestionsForCategory(category: string) {

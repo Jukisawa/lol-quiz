@@ -27,7 +27,7 @@ export class QuestionField {
   }
 
   displayHint() {
-    if (this.shownHints < this.question.hint.length) {
+    if (this.shownHints < this.question.hints.length) {
       this.shownHints++;
     }
   }

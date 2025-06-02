@@ -2,8 +2,8 @@ export interface Question {
   category: string;
   value: number;
   question: string;
-  answer: string[];
+  answers: string[];
   guessed: boolean;
   multipleChoice: boolean;
-  hint: string[];
+  hints: string[];
 }
