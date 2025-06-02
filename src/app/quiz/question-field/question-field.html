@@ -1,0 +1,23 @@
+<button class="question-value" (click)="openPopup()">
+  {{ question.value }}
+</button>
+
+<div class="popup" *ngIf="showPopup">
+  <div class="popup-content">
+    <h3>Frage für {{ question.value }} Punkte</h3>
+    <p>{{ question.question }}</p>
+    <div style="min-height:2em;">
+      <ng-container *ngFor="let h of question.hint; let i = index">
+        <p *ngIf="i < shownHints"><strong>Tipp:</strong> {{ h }}</p>
+      </ng-container>
+    </div>
+    <div *ngIf="showAnswer">
+      <p><strong>Antwort:</strong> {{ question.answer.join(', ') }}</p>
+    </div>
+    <div class="button-row">
+      <button (click)="displayHint()" *ngIf="shownHints < question.hint.length">Tipp anzeigen</button>
+      <button (click)="displayAnswer()" *ngIf="!showAnswer">Antwort anzeigen</button>
+      <button (click)="closePopup()">Schließen</button>
+    </div>
+  </div>
+</div>

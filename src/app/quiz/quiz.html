@@ -1,0 +1,11 @@
+<div class="quiz-header">
+  <h1>Quiz Game</h1>
+<div class="board">
+  <div class="category" *ngFor="let cat of categories">
+    <h3>{{ cat }}</h3>
+    <app-question-field
+      *ngFor="let q of getQuestionsForCategory(cat)"
+      [question]="q">
+    </app-question-field>
+  </div>
+</div>
